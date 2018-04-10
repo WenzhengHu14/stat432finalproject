@@ -1,0 +1,38 @@
+---
+title: "Recognition of Activities of Daily Living Using a Wrist-Worn Accelerometer"
+author: "Zach Quicksall (zsq2), Doyeon Kim (dkim1720), Nick Favale (favale2), "
+date: "4/10/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Dataset Description
+
+The Data set for ADL Recognition with Wrist-worn Accelerometer’ is a public collection of labelled accelerometer data recordings to be used for the creation and validation of acceleration models of simple ADL. The Data set is composed of the recordings of 14 simple ADL (brush_teeth, climb_stairs, comb_hair, descend_stairs, drink_glass, eat_meat, eat_soup, getup_bed, liedown_bed, pour_water, sitdown_chair, standup_chair, use_telephone, walk) performed by a total of 16 volunteers. The data are collected by a single tri-axial accelerometer attached to the right-wrist of the volunteer.
+
+## Dataset Background Information
+
+[data location - UIC Machine Learning  Repository](https://archive.ics.uci.edu/ml/datasets/Dataset+for+ADL+Recognition+with+Wrist-worn+Accelerometer)
+
+## Statistical Learning Task
+
+Classification
+
+## Data Useability
+
+```{r, echo = FALSE}
+phone = read.table("HMP_Dataset/Use_telephone/Accelerometer-2011-05-31-16-31-11-use_telephone-f1.txt", sep = " ")
+
+head(phone)
+```
+
+```{r, echo = FALSE}
+plot(phone$V1, type = "l", col = "dodgerblue", ylab = "Acceleration")
+```
+
+## Data Modeling
+
+We will use classification to predict the type of physical activity (brushing teeth, eating meat, pouring water, etc.) based on acceleration measurements provided by the data set. A substantial amount of data pre-processing will be necessary in order to model the data; for this reason we have not included it in our initial report.
