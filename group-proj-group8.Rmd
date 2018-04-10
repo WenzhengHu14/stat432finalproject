@@ -1,6 +1,6 @@
 ---
 title: "Recognition of Activities of Daily Living Using a Wrist-Worn Accelerometer"
-author: "Zach Quicksall (zsq2), Doyeon Kim (dkim1720), Nick Favale (favale2), "
+author: "Zach Quicksall (zsq2), Doyeon Kim (dkim1720), Nick Favale (favale2), Wenzheng Hu (whu14)"
 date: "4/10/2018"
 output: html_document
 ---
@@ -21,7 +21,7 @@ The Data set for ADL Recognition with Wrist-worn Accelerometer’ is a public co
 
 Classification
 
-## Data Useability
+## Data Structure
 
 ```{r, echo = FALSE}
 phone = read.table("HMP_Dataset/Use_telephone/Accelerometer-2011-05-31-16-31-11-use_telephone-f1.txt", sep = " ")
@@ -30,9 +30,20 @@ head(phone)
 ```
 
 ```{r, echo = FALSE}
-plot(phone$V1, type = "l", col = "dodgerblue", ylab = "Acceleration")
+plot(phone$V1, type = "l", col = "dodgerblue", ylab = "Acceleration", main = "Using Phone")
+lines(phone$V2, col = "darkorange")
+lines(phone$V3, col = "darkgreen")
+legend("bottom", xjust = 0.5, legend = c("X-Axis", "Y-Axis", "Z-Axis"), 
+       inset = 0.05,  title = "Acceleration Direction",
+       col = c("dodgerblue", "darkorange", "darkgreen"), lwd = 1)
 ```
 
 ## Data Modeling
 
-We will use classification to predict the type of physical activity (brushing teeth, eating meat, pouring water, etc.) based on acceleration measurements provided by the data set. A substantial amount of data pre-processing will be necessary in order to model the data; for this reason we have not included it in our initial report.
+We will use classification to predict the type of physical activity (brushing teeth, eating meat, pouring water, etc.) based on acceleration measurements provided by the data set. A substantial amount of data pre-processing will be necessary in order to model the data. The steps to perform this pre-processing are as follow:
+
+For each observation, we have tri-axial accelerometer (x, y, z) measurements at 50 Hz. In order to make features, we will use two methods:
+
+1. Vector quantize: We will cut the data in each observation to small segments with equal length. We will then use clustering technique to clusterize all segments we get from different observations and actions into k clusters. For each observation, we will then count how many of its segments belong to each cluster. As a result, for each observation, we have k features which indicate how many of its segments belong to each cluster k_i.
+
+2. An alternative approach is to filter and segment each activity signal into smaller pieces. These sections will then be converted to feature vectors and paired with the activity in question. Models will be trained on these data to predict activity type.
