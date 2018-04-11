@@ -4,12 +4,40 @@ author: "Zach Quicksall (zsq2), Doyeon Kim (dkim172), Nick Favale (favale2), Wen
 date: "4/10/2018"
 output: html_document
 ---
+```{r}
+library(rlist)
+```
 
 ## Data preprocessing
 
-
+Read data
 ```{r}
-list.files(path = ".")
+data_path = "HMP_Dataset"
+num_action = 0
+# element n is the actual name of class n
+class_to_actions = list()
+data_matrix = list()
+index = 0
+
+# each row is a file, the first element of a row is its class(1-16), the rest are flattened (through each time unit) 3 dimension data
+
+for (action in list.files(path = data_path)){
+  action_path = paste(data_path, action, sep = "/")
+  num_action = num_action + 1
+  class_to_actions[actions] = action
+  
+  for (file in list.files(path = action_path)){
+    file_name = paste(action_path, file, sep = "/")
+    data = read.table(file_name)
+    index = index + 1
+    data_matrix[[index]] = c(num_action, as.list(t(data)))
+  }
+}
+```
+
+Segment data
+```{r}
+
 ```
 
 ## Including Plots
