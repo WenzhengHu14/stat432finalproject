@@ -4,27 +4,38 @@ author: "Zach Quicksall (zsq2), Doyeon Kim (dkim172), Nick Favale (favale2), Wen
 date: "4/10/2018"
 output: html_document
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+library(rlist)
 ```
 
-## R Markdown
+## Data preprocessing
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Read data
+```{r}
+data_path = "HMP_Dataset"
+num_action = 0
+# element n is the actual name of class n
+class_to_actions = list()
+data_matrix = list()
+index = 0
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# each row is a file, the first element of a row is its class(1-16), the rest are flattened (through each time unit) 3 dimension data
 
-```{r cars}
-summary(cars)
+for (action in list.files(path = data_path)){
+  action_path = paste(data_path, action, sep = "/")
+  num_action = num_action + 1
+  class_to_actions[actions] = action
+  
+  for (file in list.files(path = action_path)){
+    file_name = paste(action_path, file, sep = "/")
+    data = read.table(file_name)
+    index = index + 1
+    data_matrix[[index]] = c(num_action, as.list(t(data)))
+  }
+}
 ```
 
-## Including Plots
+Segment data
+```{r}
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
