@@ -112,7 +112,7 @@ confusionMatrix(pred, data$class)
 ```
 
 ```{r}
-# comment
+# test comment
 cv_5 = trainControl(method = "cv", number = 5)
 gbm_grid = expand.grid(interaction.depth = c(1, 2),
                        n.trees = c(500, 1000, 1500),
