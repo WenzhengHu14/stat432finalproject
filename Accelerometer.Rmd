@@ -4,7 +4,7 @@ author: "Zach Quicksall (zsq2), Doyeon Kim (dkim172), Nick Favale (favale2), Wen
 date: "4/10/2018"
 output: html_document
 ---
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(rlist)
 library(flexclust)
 library(gbm)
@@ -42,20 +42,20 @@ for (action in list.files(path = data_path)){
 
 Segment data
 ```{r}
-fit = function(input_data, cut_size, dup_length=0, num_clusters){
+fit = function(input_data, cut_size, overlap=0, num_clusters){
   cutted_signals = list()
   index = 0
   for (observation in input_data){
     index = index + 1
-    cutted_signals = c(cutted_signals, cut_signal(observation[-1], cut_size, dup_length))
+    cutted_signals = c(cutted_signals, cut_signal(observation[-1], cut_size, overlap))
   }
   matrix_signals = matrix(unlist(cutted_signals), ncol=3*cut_size, byrow=T)
-  model = kcca(matrix_signals, k=num_clusters, kccaFamily("kmeans"))
+  model = flexclust::kcca(matrix_signals, k=num_clusters, kccaFamily("kmeans"))
   
   return(model)
 }
 
-cut_signal = function(input_data, cut_size, dup_length=0){
+cut_signal = function(input_data, cut_size, overlap=0){
   result_data = list()
   input_data_size = length(input_data)
   input_data_idx = 1
@@ -63,19 +63,19 @@ cut_signal = function(input_data, cut_size, dup_length=0){
 
   while (input_data_idx + cut_size*3 < input_data_size){
     result_data[[result_data_idx]] = input_data[input_data_idx:(input_data_idx+cut_size*3-1)]
-    input_data_idx = input_data_idx + cut_size*3 - dup_length*3
+    input_data_idx = input_data_idx + cut_size*3 - overlap*3
     result_data_idx = result_data_idx + 1
   }
   return(result_data)
 }
 
 # the returned data is a datafrane with num_clusters+1 columns. The last column is its label.
-transform = function(model, input_data, cut_size, dup_length, num_clusters){
+transform = function(model, input_data, cut_size, overlap, num_clusters){
   features = list()
   index = 0
   for (observation in input_data){
     index = index + 1
-    cutted_signals = cut_signal(observation[-1], cut_size, dup_length)
+    cutted_signals = cut_signal(observation[-1], cut_size, overlap)
     matrix_signals = matrix(unlist(cutted_signals), ncol=3*cut_size, byrow=T)
     pred_clusters = predict(model, matrix_signals)
     feature = count_cluster(pred_clusters, num_clusters)
@@ -98,8 +98,8 @@ count_cluster = function(pred_clusters, num_clusters){
 
 
 ```{r}
-model = fit(data_matrix, 10, 0, 10)
-data = transform(model, data_matrix, 10, 0, 10)
+model = fit(data_matrix, cut_size=10, overlap=0, features=10)
+data = transform(model, data_matrix, cut_size=10, overlap=0, features=10)
 data['class'] = as.factor(data$class)
 ```
 
