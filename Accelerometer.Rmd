@@ -98,8 +98,8 @@ count_cluster = function(pred_clusters, num_clusters){
 
 
 ```{r}
-model = fit(data_matrix, cut_size=10, overlap=0, features=10)
-data = transform(model, data_matrix, cut_size=10, overlap=0, features=10)
+model = fit(data_matrix, cut_size=10, overlap=0, num_clusters=10)
+data = transform(model, data_matrix, cut_size=10, overlap=0, num_clusters=10)
 data['class'] = as.factor(data$class)
 ```
 
