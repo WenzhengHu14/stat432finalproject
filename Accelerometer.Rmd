@@ -39,6 +39,8 @@ load_data = function(data_path){
       data_matrix[[index]] = c(num_action, as.list(t(data)))
     }
   }
+  
+  return(data_matrix)
 }
 ```
 
@@ -107,10 +109,15 @@ process_data = function(data_matrix, data_path, cut_size, overlap, num_clusters)
 }
 ```
 
+Example to get processed data
 ```{r}
 data_path = "HMP_Dataset"
-data_matrix = load_data(data_path)
-data = get_processed_data(data_matrix, cut_size=10, overlap=0, num_clusters=10)
+
+# don't need to load data multiple times when tunning parameters
+data_matrix_raw = load_data(data_path)
+
+# may need to processed data several times when tuning parameters
+data = process_data(data_matrix_raw, cut_size=10, overlap=0, num_clusters=10)
 
 # test_train split
 trainIndex = createDataPartition(data$class, p=0.7, list=FALSE,times=1)
@@ -118,6 +125,8 @@ data_trn = data[trainIndex,]
 data_tst = data[-trainIndex,]
 ```
 
+
+##### Random Forest
 ```{r}
 gbm_model = randomForest(class ~ ., data = data)
 pred = predict(gbm_model)
