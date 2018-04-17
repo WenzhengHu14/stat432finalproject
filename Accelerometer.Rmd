@@ -15,32 +15,34 @@ library(randomForest)
 
 ## Data preprocessing
 
-Read data
+Load data
 ```{r}
-data_path = "HMP_Dataset"
-num_action = 0
-# element n is the actual name of class n
-class_to_actions = list()
-data_matrix = list()
-index = 0
-
-# each row is a file, the first element of a row is its class(1-16), the rest are flattened (through each time unit) 3 dimension data
-
-for (action in list.files(path = data_path)){
-  action_path = paste(data_path, action, sep = "/")
-  num_action = num_action + 1
-  class_to_actions[num_action] = action
+# use this to load raw data
+load_data = function(data_path){
+  num_action = 0
+  # element n is the actual name of class n
+  class_to_actions = list()
+  data_matrix = list()
+  index = 0
   
-  for (file in list.files(path = action_path)){
-    file_name = paste(action_path, file, sep = "/")
-    data = read.table(file_name)
-    index = index + 1
-    data_matrix[[index]] = c(num_action, as.list(t(data)))
+  # each row is a file, the first element of a row is its class(1-16), the rest are flattened (through each time unit) 3 dimension data
+  
+  for (action in list.files(path = data_path)){
+    action_path = paste(data_path, action, sep = "/")
+    num_action = num_action + 1
+    class_to_actions[num_action] = action
+    
+    for (file in list.files(path = action_path)){
+      file_name = paste(action_path, file, sep = "/")
+      data = read.table(file_name)
+      index = index + 1
+      data_matrix[[index]] = c(num_action, as.list(t(data)))
+    }
   }
 }
 ```
 
-Segment data
+Process data
 ```{r}
 fit = function(input_data, cut_size, overlap=0, num_clusters){
   cutted_signals = list()
@@ -94,14 +96,23 @@ count_cluster = function(pred_clusters, num_clusters){
   }
   return(feature)
 }
+
+# use this to process data
+process_data = function(data_matrix, data_path, cut_size, overlap, num_clusters){
+  
+  model = fit(data_matrix, cut_size, overlap, num_clusters)
+  data = transform(model, data_matrix, cut_size, overlap, num_clusters)
+  data['class'] = as.factor(data$class)
+  return(data)
+}
 ```
 
-
 ```{r}
-model = fit(data_matrix, cut_size=10, overlap=0, num_clusters=10)
-data = transform(model, data_matrix, cut_size=10, overlap=0, num_clusters=10)
-data['class'] = as.factor(data$class)
+data_path = "HMP_Dataset"
+data_matrix = load_data(data_path)
+data = get_processed_data(data_matrix, cut_size=10, overlap=0, num_clusters=10)
 
+# test_train split
 trainIndex = createDataPartition(data$class, p=0.7, list=FALSE,times=1)
 data_trn = data[trainIndex,]
 data_tst = data[-trainIndex,]
