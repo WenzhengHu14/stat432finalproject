@@ -101,6 +101,10 @@ count_cluster = function(pred_clusters, num_clusters){
 model = fit(data_matrix, cut_size=10, overlap=0, num_clusters=10)
 data = transform(model, data_matrix, cut_size=10, overlap=0, num_clusters=10)
 data['class'] = as.factor(data$class)
+
+trainIndex = createDataPartition(data$class, p=0.7, list=FALSE,times=1)
+data_trn = data[trainIndex,]
+data_tst = data[-trainIndex,]
 ```
 
 ```{r}
