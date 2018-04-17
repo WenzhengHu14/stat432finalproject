@@ -6,6 +6,11 @@ output: html_document
 ---
 ```{r}
 library(rlist)
+library(flexclust)
+library(gbm)
+library(caret)
+library(ape)
+library(randomForest)
 ```
 
 ## Data preprocessing
@@ -24,7 +29,7 @@ index = 0
 for (action in list.files(path = data_path)){
   action_path = paste(data_path, action, sep = "/")
   num_action = num_action + 1
-  class_to_actions[actions] = action
+  class_to_actions[num_action] = action
   
   for (file in list.files(path = action_path)){
     file_name = paste(action_path, file, sep = "/")
@@ -37,5 +42,90 @@ for (action in list.files(path = data_path)){
 
 Segment data
 ```{r}
+fit = function(input_data, cut_size, dup_length=0, num_clusters){
+  cutted_signals = list()
+  index = 0
+  for (observation in input_data){
+    index = index + 1
+    cutted_signals = c(cutted_signals, cut_signal(observation[-1], cut_size, dup_length))
+  }
+  matrix_signals = matrix(unlist(cutted_signals), ncol=3*cut_size, byrow=T)
+  model = kcca(matrix_signals, k=num_clusters, kccaFamily("kmeans"))
+  
+  return(model)
+}
 
+cut_signal = function(input_data, cut_size, dup_length=0){
+  result_data = list()
+  input_data_size = length(input_data)
+  input_data_idx = 1
+  result_data_idx = 1
+
+  while (input_data_idx + cut_size*3 < input_data_size){
+    result_data[[result_data_idx]] = input_data[input_data_idx:(input_data_idx+cut_size*3-1)]
+    input_data_idx = input_data_idx + cut_size*3 - dup_length*3
+    result_data_idx = result_data_idx + 1
+  }
+  return(result_data)
+}
+
+# the returned data is a datafrane with num_clusters+1 columns. The last column is its label.
+transform = function(model, input_data, cut_size, dup_length, num_clusters){
+  features = list()
+  index = 0
+  for (observation in input_data){
+    index = index + 1
+    cutted_signals = cut_signal(observation[-1], cut_size, dup_length)
+    matrix_signals = matrix(unlist(cutted_signals), ncol=3*cut_size, byrow=T)
+    pred_clusters = predict(model, matrix_signals)
+    feature = count_cluster(pred_clusters, num_clusters)
+    feature[num_clusters+1] = observation[1]
+    features[[index]] = feature
+  }
+  dt_features = data.frame(matrix(unlist(features), ncol=num_clusters+1, byrow=T))
+  colnames(dt_features)[num_clusters+1] = "class"
+  return(dt_features)
+}
+
+count_cluster = function(pred_clusters, num_clusters){
+  feature = 1:num_clusters+1
+  for (i in 1:num_clusters){
+    feature[i] = sum(pred_clusters==i)
+  }
+  return(feature)
+}
 ```
+
+
+```{r}
+model = fit(data_matrix, 10, 0, 10)
+data = transform(model, data_matrix, 10, 0, 10)
+data['class'] = as.factor(data$class)
+```
+
+```{r}
+gbm_model = randomForest(class ~ ., data = data)
+pred = predict(gbm_model)
+
+# plot the confusion matrix
+confusionMatrix(pred, data$class)
+```
+
+```{r}
+cv_5 = trainControl(method = "cv", number = 5)
+gbm_grid = expand.grid(interaction.depth = c(1, 2),
+                       n.trees = c(500, 1000, 1500),
+                       shrinkage = c(0.001, 0.01, 0.1),
+                       n.minobsinnode = 10)
+
+gbm_cv = train(class ~ ., data = data,
+                      method = "gbm",
+                      trControl = cv_5,
+                      verbose = FALSE,
+                      tuneGrid = gbm_grid)
+pred = predict(gbm_cv)
+
+# plot the confusion matrix
+confusionMatrix(pred, data$class)
+```
+
