@@ -101,7 +101,6 @@ count_cluster = function(pred_clusters, num_clusters){
 
 # use this to process data
 process_data = function(data_matrix, data_path, cut_size, overlap, num_clusters){
-  
   model = fit(data_matrix, cut_size, overlap, num_clusters)
   data = transform(model, data_matrix, cut_size, overlap, num_clusters)
   data['class'] = as.factor(data$class)
@@ -127,12 +126,101 @@ data_tst = data[-trainIndex,]
 
 
 ##### Random Forest
-```{r}
-gbm_model = randomForest(class ~ ., data = data)
-pred = predict(gbm_model)
 
-# plot the confusion matrix
-confusionMatrix(pred, data$class)
+Helper functions for parameter tuning
+```{r}
+# get the best result from the result data frame
+get_best_result = function(result_df) {
+  best = which(result_df['Accuracy'] == max(result_df['Accuracy']))
+  return(result_df[best,])
+}
+
+
+# tunning rf using preprocessing paramters
+tune_rf = function(raw_data, cut_sizes, overlaps, nums_clusters, tst_trn_split){
+  total_iter = length(cut_sizes) * length(overlaps) * length(overlaps)
+
+  # only need to run once
+  cv_5 = trainControl(method = "cv", number = 5)
+  result = data.frame(matrix(1:6,ncol=6))
+  colnames(result) = list("Cut size", "Overlap", "Num of features", "mtry", "Accuracy", "AccuracySD")
+  result_idx = 1
+  
+  iter = 0
+  start_time = Sys.time()
+  
+  # iterating through all possible parameters
+  for (cut_size in cut_sizes){
+    for (overlap in overlaps){
+      for (num_clusters in nums_clusters){
+        if (overlap >= cut_size){
+          iter = iter + 1
+          print(paste("Iteration: ", iter, "finished in ", Sys.time()-start_time, "mins. Total iter: ", total_iter))
+          start_time = Sys.time()
+          next
+        }
+        data = process_data(raw_data, cut_size=cut_size, overlap=overlap, num_clusters=num_clusters)
+        data_trn = data[tst_trn_split,]
+        data_tst = data[-tst_trn_split,]
+        
+        rf_cv_grid = expand.grid(mtry=1:num_clusters)
+        rf_cv = train(class ~ . , data = data_trn,
+                              method = "rf",
+                              trControl = cv_5,
+                              verbose = FALSE,
+                              preProcess = c("center", "scale"),
+                              tuneGrid = rf_cv_grid)
+        
+        for (row in 1:num_clusters){
+          result[result_idx, ] = c(cut_size, overlap, num_clusters, rf_cv$results[row,1], rf_cv$results[row,2], rf_cv$results[row,4]) 
+          result_idx = result_idx + 1
+        }
+        
+        iter = iter + 1
+        print(paste("Iteration: ", iter, "finished in ", Sys.time()-start_time, "s. Total iter: ", total_iter))
+        start_time = Sys.time()
+      }
+    }
+  }
+  return(result)
+}
+```
+
+Tunning rf model parameters(don't run it since it is super slow. Result are in the following chunk)
+```{r eval=FALSE}
+# tunning parameter grid, mtry is all the possible value
+cut_sizes = list(1, 5, 10, 20)
+overlaps = list(0, 3, 5)
+nums_clusters = list(5, 10, 20)
+
+# test train split to be passed to the tuning function
+set.seed(59999)
+trainIndex = createDataPartition(1:length(raw_data), p=0.7, list=FALSE,times=1)
+
+# tunning function, retrun result in data from
+rf_cv = tune_rf(data_matrix_raw, cut_sizes=cut_sizes, overlaps=overlaps, nums_clusters=nums_clusters, tst_trn_split=trainIndex)
+
+# find the best result and train 
+best_result = get_best_result(rf_cv)
+```
+
+Train with best result and test with testing set
+```{r}
+cv_5 = trainControl(method = "cv", number = 5)
+
+#data = process_data(data_matrix_raw, cut_size=best_result$'Cut size', overlap=best_result$'Overlap', num_clusters=best_result$'Num of features')
+data = process_data(data_matrix_raw, cut_size=1, overlap=0, num_clusters=20)
+data_trn = data[trainIndex,]
+data_tst = data[-trainIndex,]
+
+#rf_final = randomForest(class~., data=data_trn, mtry=best_result$mtry)
+rf_final = randomForest(class~., data=data_trn, mtry=8)
+pred_rf = predict(rf_final, data_tst)
+
+# return test set accuracy
+cm_rf = confusionMatrix(pred_rf, data_tst$class)
+cm_rf$table
+cm_rf$overall['Accuracy']
 ```
 
 ```{r}
