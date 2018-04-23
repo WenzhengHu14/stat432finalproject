@@ -134,8 +134,9 @@ get_best_result = function(result_df) {
   best = which(result_df['Accuracy'] == max(result_df['Accuracy']))
   return(result_df[best,])
 }
+```
 
-
+```{r}
 # tunning rf using preprocessing paramters
 tune_rf = function(raw_data, cut_sizes, overlaps, nums_clusters, tst_trn_split){
   total_iter = length(cut_sizes) * length(overlaps) * length(overlaps)
@@ -223,6 +224,67 @@ cm_rf$table
 cm_rf$overall['Accuracy']
 ```
 
+##### Support Vector Machine
+
+```{r}
+# Linear SVM
+#lin_svm_grid = expand.grid(C = c(1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1000, 10000))
+best_lin_svm_grid = expand.grid(C = c(1000))
+
+lin_svm_mod = train(class ~ .,
+                    data = data_trn,
+                    method = "svmLinear",
+                    preProcess = c("center","scale"),
+                    trControl = trainControl(method = "none"),
+                    tuneGrid = best_lin_svm_grid,
+                    verbose = FALSE)
+
+lin_test_pred = predict(lin_svm_mod, data_tst)
+confusionMatrix(lin_test_pred, data_tst$class)
+```
+
+```{r}
+# Polynomial SVM
+poly_svm_grid = expand.grid(degree = c(2,3,4,5),
+                            scale = c(1, 1e-1, 1e-2, 1e-3, 1e-4),
+                            C = c(1e-2, 1e-1, 1, 10, 100))
+
+best_poly_svm_grid = expand.grid(degree = c(2),
+                            scale = c(1),
+                            C = c(10))
+
+poly_svm_mod = train(class ~ .,
+                    data = data_trn,
+                    method = "svmPoly",
+                    preProcess = c("center","scale"),
+                    trControl = trainControl(method = "none"),
+                    tuneGrid = best_poly_svm_grid,
+                    verbose = FALSE)
+
+poly_test_pred = predict(poly_svm_mod, data_tst)
+confusionMatrix(poly_test_pred, data_tst$class)
+```
+
+```{r}
+# Gaussian Kernel SVM
+
+best_rbf_svm_grid = expand.grid(C = c(512),
+                                sigma = c(0.5047778))
+
+rbf_svm_mod = train(class ~ .,
+                    data = data_trn,
+                    method = "svmRadial",
+                    preProcess = c("center","scale"),
+                    trControl = trainControl(method = "none"),
+                    tuneGrid = best_rbf_svm_grid,
+                    verbose = FALSE)
+
+rbf_test_pred = predict(rbf_svm_mod, data_tst)
+confusionMatrix(rbf_test_pred, data_tst$class)
+```
+
+##### Quick GBM test
+
 ```{r}
 # test comment
 cv_5 = trainControl(method = "cv", number = 5)
@@ -241,4 +303,15 @@ pred = predict(gbm_cv)
 # plot the confusion matrix
 confusionMatrix(pred, data$class)
 ```
+
+
+
+
+
+
+
+
+
+
+
 
