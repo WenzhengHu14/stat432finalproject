@@ -128,7 +128,6 @@ data_tst = data[-trainIndex,]
 
 ##### Random Forest
 
-
 ```{r echo=FLASE}
 #
 # Helper functions for parameter tuning to get the best result from the result data frame
