@@ -4,7 +4,7 @@ author: "Zach Quicksall (zsq2), Doyeon Kim (dkim172), Nick Favale (favale2), Wen
 date: "4/10/2018"
 output: html_document
 ---
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
 library(rlist)
 library(flexclust)
 library(gbm)
@@ -15,8 +15,8 @@ library(randomForest)
 
 ## Data preprocessing
 
-Load data
-```{r}
+```{r echo=FALSE}
+# Load data
 # use this to load raw data
 load_data = function(data_path){
   num_action = 0
@@ -45,7 +45,8 @@ load_data = function(data_path){
 ```
 
 Process data
-```{r}
+```{r echo=FALSE}
+# Process data
 fit = function(input_data, cut_size, overlap=0, num_clusters){
   cutted_signals = list()
   index = 0
@@ -108,36 +109,37 @@ process_data = function(data_matrix, data_path, cut_size, overlap, num_clusters)
 }
 ```
 
-Example to get processed data
+##### Load and preprocess data
 ```{r}
 data_path = "HMP_Dataset"
 
-# don't need to load data multiple times when tunning parameters
+# Load raw data from the data file
 data_matrix_raw = load_data(data_path)
 
-# may need to processed data several times when tuning parameters
+# Preprocess the data by Vector Quantization
+# preprocess_data will be called multiple times in parameter tuning since parameter of preprocessing also need to be tuned
 data = process_data(data_matrix_raw, cut_size=10, overlap=0, num_clusters=10)
 
-# test_train split
+# Test-train split
 trainIndex = createDataPartition(data$class, p=0.7, list=FALSE,times=1)
 data_trn = data[trainIndex,]
 data_tst = data[-trainIndex,]
 ```
 
-
 ##### Random Forest
 
-Helper functions for parameter tuning
-```{r}
-# get the best result from the result data frame
+
+```{r echo=FLASE}
+#
+# Helper functions for parameter tuning to get the best result from the result data frame
 get_best_result = function(result_df) {
   best = which(result_df['Accuracy'] == max(result_df['Accuracy']))
   return(result_df[best,])
 }
 ```
 
-```{r}
-# tunning rf using preprocessing paramters
+```{r echo=FALSE}
+# Tunning rf using preprocessing paramters
 tune_rf = function(raw_data, cut_sizes, overlaps, nums_clusters, tst_trn_split){
   total_iter = length(cut_sizes) * length(overlaps) * length(overlaps)
 
@@ -187,38 +189,38 @@ tune_rf = function(raw_data, cut_sizes, overlaps, nums_clusters, tst_trn_split){
 }
 ```
 
-Tunning rf model parameters(don't run it since it is super slow. Result are in the following chunk)
+Tunning rf model parameters with helper function tune_rf
 ```{r eval=FALSE}
-# tunning parameter grid, mtry is all the possible value
+# Tunning parameter grid, mtry is all the possible value (1 to num_clusters)
 cut_sizes = list(1, 5, 10, 20)
 overlaps = list(0, 3, 5)
 nums_clusters = list(5, 10, 20)
 
-# test train split to be passed to the tuning function
+# Test train split to be passed to the tuning function
 set.seed(59999)
-trainIndex = createDataPartition(1:length(raw_data), p=0.7, list=FALSE,times=1)
+trainIndex = createDataPartition(1:length(data_matrix_raw), p=0.7, list=FALSE,times=1)
 
-# tunning function, retrun result in data from
+# Tunning function, retrun result in data from
 rf_cv = tune_rf(data_matrix_raw, cut_sizes=cut_sizes, overlaps=overlaps, nums_clusters=nums_clusters, tst_trn_split=trainIndex)
 
-# find the best result and train 
+# Find the best result and train 
 best_result = get_best_result(rf_cv)
 ```
 
-Train with best result and test with testing set
+Train with best result from previous chunck and test with testing set
 ```{r}
 cv_5 = trainControl(method = "cv", number = 5)
 
-#data = process_data(data_matrix_raw, cut_size=best_result$'Cut size', overlap=best_result$'Overlap', num_clusters=best_result$'Num of features')
+# Preprocess data with best parameters
 data = process_data(data_matrix_raw, cut_size=1, overlap=0, num_clusters=20)
 data_trn = data[trainIndex,]
 data_tst = data[-trainIndex,]
 
-#rf_final = randomForest(class~., data=data_trn, mtry=best_result$mtry)
+# Train the rf with the preprocessed data with best parameters and predict the test data
 rf_final = randomForest(class~., data=data_trn, mtry=8)
 pred_rf = predict(rf_final, data_tst)
 
-# return test set accuracy
+# Return test set accuracy
 cm_rf = confusionMatrix(pred_rf, data_tst$class)
 cm_rf$table
 cm_rf$overall['Accuracy']
@@ -329,6 +331,39 @@ knn_cv = train(class ~ ., data = data_trn,
   }
   return(result)
 }
+
+##### GBM
+
+```{r}
+get_best_result_accuracy = function(caret_fit) {
+  best = which(rownames(caret_fit$results) == rownames(caret_fit$bestTune))
+  best_result = caret_fit$results[best, ]
+  rownames(best_result) = NULL
+  best_result
+}
+
+# Setting GBM Grid
+gbm_grid = expand.grid(interaction.depth = 8,
+                       n.trees = 1038,
+                       shrinkage = 0.01,
+                       n.minobsinnode = 10)
+
+# 5-folds GBM Model
+gbm_model_cv = train(class ~ ., 
+                     data = data_trn, 
+                     method = "gbm",
+                     trControl = trainControl(method = "cv", number = 5),
+                     tuneGrid = gbm_grid,
+                     verbose = FALSE)
+
+# Tuning Parameter
+gbm_model_cv$bestTune
+
+# Accuracy
+get_best_result_accuracy(gbm_model_cv)$Accuracy
+
+gbm_test_pred = predict(gbm_model_cv, data_tst)
+confusionMatrix(gbm_test_pred, data_tst$class)
 ```
 
 ```{r}
