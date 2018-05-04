@@ -331,32 +331,6 @@ knn_cv = train(class ~ ., data = data_trn,
 }
 ```
 
-##### GBM asdf
-```{r}
-# GBM Grid/Parameter
-gbm_grid = expand.grid(interaction.depth = 8,
-                       n.trees = 1038,
-                       shrinkage = 0.01,
-                       n.minobsinnode = 10)
-
-# 5-folds GBM Model
-gbm_model_cv = train(class ~ ., 
-                     data = data_trn, 
-                     method = "gbm",
-                     trControl = trainControl(method = "cv", number = 5),
-                     tuneGrid = gbm_grid,
-                     verbose = FALSE)
-
-# Tuning Parameter
-gbm_model_cv$bestTune
-
-# Accuracy
-get_best_result(gbm_model_cv)
-
-gbm_test_pred = predict(gbm_model_cv, data_tst)
-confusionMatrix(gbm_test_pred, data_tst$class)
-```
-
 ```{r}
 # KNN results
 
@@ -391,7 +365,31 @@ cm_knn_2$table
 cm_knn_2$overall['Accuracy']
 ```
 
+##### GBM
+```{r}
+# GBM Grid/Parameter
+gbm_grid = expand.grid(interaction.depth = 8,
+                       n.trees = 1038,
+                       shrinkage = 0.01,
+                       n.minobsinnode = 10)
 
+# 5-folds GBM Model
+gbm_model_cv = train(class ~ ., 
+                     data = data_trn, 
+                     method = "gbm",
+                     trControl = trainControl(method = "cv", number = 5),
+                     tuneGrid = gbm_grid,
+                     verbose = FALSE)
+
+# Tuning Parameter
+gbm_model_cv$bestTune
+
+# Accuracy
+get_best_result(gbm_model_cv)
+
+gbm_test_pred = predict(gbm_model_cv, data_tst)
+confusionMatrix(gbm_test_pred, data_tst$class)
+```
 
 
 
