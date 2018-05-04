@@ -387,21 +387,10 @@ gbm_model_cv$bestTune
 
 # Accuracy
 get_best_result(gbm_model_cv)
-<<<<<<< HEAD
-=======
 
 gbm_test_pred = predict(gbm_model_cv, data_tst)
 confusionMatrix(gbm_test_pred, data_tst$class)
 ```
-
-
-
->>>>>>> 2d406d9187dfed41a3e01c769a51003f621a2964
-
-gbm_test_pred = predict(gbm_model_cv, data_tst)
-confusionMatrix(gbm_test_pred, data_tst$class)
-```
-
 
 
 
