@@ -357,7 +357,7 @@ knn_final_2 = train(class ~ ., data = data_trn,
                method = "knn",
                trControl = trainControl(method = "none"),
                preProcess = c("center", "scale"),
-               tuneGrid = expand.grid(k = cval + 3))
+               tuneGrid = expand.grid(k = cval + 2))
 pred_knn_2 = predict(knn_final_2, data_tst)
 
 cm_knn_2 = confusionMatrix(pred_knn_2, data_tst$class)
@@ -366,6 +366,10 @@ cm_knn_2$overall['Accuracy']
 ```
 
 ##### GBM
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2d406d9187dfed41a3e01c769a51003f621a2964
 ```{r}
 # GBM Grid/Parameter
 gbm_grid = expand.grid(interaction.depth = 8,
@@ -386,6 +390,16 @@ gbm_model_cv$bestTune
 
 # Accuracy
 get_best_result(gbm_model_cv)
+<<<<<<< HEAD
+=======
+
+gbm_test_pred = predict(gbm_model_cv, data_tst)
+confusionMatrix(gbm_test_pred, data_tst$class)
+```
+
+
+
+>>>>>>> 2d406d9187dfed41a3e01c769a51003f621a2964
 
 gbm_test_pred = predict(gbm_model_cv, data_tst)
 confusionMatrix(gbm_test_pred, data_tst$class)
