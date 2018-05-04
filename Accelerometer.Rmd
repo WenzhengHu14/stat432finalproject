@@ -329,18 +329,11 @@ knn_cv = train(class ~ ., data = data_trn,
   }
   return(result)
 }
+```
 
-##### GBM
-
+##### GBM asdf
 ```{r}
-get_best_result_accuracy = function(caret_fit) {
-  best = which(rownames(caret_fit$results) == rownames(caret_fit$bestTune))
-  best_result = caret_fit$results[best, ]
-  rownames(best_result) = NULL
-  best_result
-}
-
-# Setting GBM Grid
+# GBM Grid/Parameter
 gbm_grid = expand.grid(interaction.depth = 8,
                        n.trees = 1038,
                        shrinkage = 0.01,
@@ -358,7 +351,7 @@ gbm_model_cv = train(class ~ .,
 gbm_model_cv$bestTune
 
 # Accuracy
-get_best_result_accuracy(gbm_model_cv)$Accuracy
+get_best_result(gbm_model_cv)
 
 gbm_test_pred = predict(gbm_model_cv, data_tst)
 confusionMatrix(gbm_test_pred, data_tst$class)
