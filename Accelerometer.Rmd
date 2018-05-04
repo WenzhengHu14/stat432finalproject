@@ -366,10 +366,7 @@ cm_knn_2$overall['Accuracy']
 ```
 
 ##### GBM
-<<<<<<< HEAD
-=======
 
->>>>>>> 2d406d9187dfed41a3e01c769a51003f621a2964
 ```{r}
 # GBM Grid/Parameter
 gbm_grid = expand.grid(interaction.depth = 8,
