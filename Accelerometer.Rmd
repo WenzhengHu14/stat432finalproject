@@ -227,6 +227,7 @@ cm_rf$overall['Accuracy']
 
 ##### Support Vector Machine
 
+Best Linear SVM
 ```{r}
 # Linear SVM
 #lin_svm_grid = expand.grid(C = c(1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1000, 10000))
@@ -244,6 +245,7 @@ lin_test_pred = predict(lin_svm_mod, data_tst)
 confusionMatrix(lin_test_pred, data_tst$class)
 ```
 
+Best Polynomial SVM
 ```{r}
 # Polynomial SVM
 poly_svm_grid = expand.grid(degree = c(2,3,4,5),
@@ -266,6 +268,7 @@ poly_test_pred = predict(poly_svm_mod, data_tst)
 confusionMatrix(poly_test_pred, data_tst$class)
 ```
 
+Best Gaussian SVM (also the best model of the three)
 ```{r}
 # Gaussian Kernel SVM
 
@@ -282,6 +285,75 @@ rbf_svm_mod = train(class ~ .,
 
 rbf_test_pred = predict(rbf_svm_mod, data_tst)
 confusionMatrix(rbf_test_pred, data_tst$class)
+```
+
+Model and preprocessing tuning
+```{r}
+# Function for tuning both SVM and data preprocessing
+tune_linear_svm = function(raw_data, cut_sizes, overlaps, nums_clusters, tst_trn_split){
+  total_iter = length(cut_sizes) * length(overlaps) * length(overlaps)
+
+  # only need to run once
+  cv_5 = trainControl(method = "cv", number = 5)
+  result = data.frame(matrix(1:6,ncol=6))
+  colnames(result) = list("Cut size", "Overlap", "Num of features", "mtry", "Accuracy", "AccuracySD")
+  result_idx = 1
+  
+  iter = 0
+  start_time = Sys.time()
+  
+  # iterating through all possible parameters
+  for (cut_size in cut_sizes){
+    for (overlap in overlaps){
+      for (num_clusters in nums_clusters){
+        if (overlap >= cut_size){
+          iter = iter + 1
+          print(paste("Iteration: ", iter, "finished in ", Sys.time()-start_time, "mins. Total iter: ", total_iter))
+          start_time = Sys.time()
+          next
+        }
+        data = process_data(raw_data, cut_size=cut_size, overlap=overlap, num_clusters=num_clusters)
+        data_trn = data[tst_trn_split,]
+        data_tst = data[-tst_trn_split,]
+        
+        lin_svm_cv_grid = expand.grid(C = c(1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1000, 10000))
+        lin_svm_cv = train(class ~ . , data = data_trn,
+                          method = "svmLinear",
+                          trControl = cv_5,
+                          verbose = FALSE,
+                          preProcess = c("center", "scale"),
+                          tuneGrid = lin_svm_cv_grid)
+        
+        for (row in 1:num_clusters){
+          result[result_idx, ] = c(cut_size, overlap, num_clusters, lin_svm_cv$results[row,1], lin_svm_cv$results[row,2], lin_svm_cv$results[row,4]) 
+          result_idx = result_idx + 1
+        }
+        
+        iter = iter + 1
+        print(paste("Iteration: ", iter, "finished in ", Sys.time()-start_time, "s. Total iter: ", total_iter))
+        start_time = Sys.time()
+      }
+    }
+  }
+  return(result)
+}
+```
+
+```{r}
+# Tune SVM
+cut_sizes = list(1, 5, 10, 20)
+overlaps = list(0, 3, 5)
+nums_clusters = list(5, 10, 20)
+
+# test train split to be passed to the tuning function
+set.seed(59999)
+trainIndex = createDataPartition(1:length(data_matrix_raw), p=0.7, list=FALSE,times=1)
+
+# tunning function, retrun result in data from
+lin_svm_cv = tune_linear_svm(data_matrix_raw, cut_sizes=cut_sizes, overlaps=overlaps, nums_clusters=nums_clusters, tst_trn_split=trainIndex)
+
+# find the best result and train 
+best_result = get_best_result(lin_svm_cv)
 ```
 
 ##### K-Nearest Neighbors
