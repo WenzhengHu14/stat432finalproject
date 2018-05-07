@@ -110,6 +110,7 @@ process_data = function(data_matrix, data_path, cut_size, overlap, num_clusters)
 ```
 
 ##### Load and preprocess data
+
 ```{r}
 data_path = "HMP_Dataset"
 
@@ -392,7 +393,9 @@ gbm_test_pred = predict(gbm_model_cv, data_tst)
 confusionMatrix(gbm_test_pred, data_tst$class)
 ```
 
-
+## result
+```{r}
+```
 
 
 
