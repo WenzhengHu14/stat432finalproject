@@ -527,7 +527,7 @@ A summary of the testing and training accuracy of each model is presented below:
 acc_trn_all = c(acc_rf_trn, acc_svm_lin_trn, acc_svm_poly_trn, acc_rbf_trn, acc_knn_trn, acc_gbm_trn)
 accE_tst_all = c(acc_rf_tst, acc_svm_lin_tst, acc_svm_poly_tst, acc_rbf_tst, acc_knn_tst, acc_gbm_tst)
 
-row_names = c("Random Forest", "Linear SVM" , "Polynomial SVM" , "Gaussian SVM", "KNN" , "Gbm" )
+row_names = c("Random Forest", "Linear SVM" , "Polynomial SVM" , "Gaussian SVM", "KNN" , "GBM" )
 col_names = c("Training Accuracy", "Testing Accuracy")
 
 result = data.frame(acc_trn_all, accE_tst_all, row.names=row_names)
