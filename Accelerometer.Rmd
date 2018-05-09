@@ -529,7 +529,7 @@ colnames(result) = col_names
 # render the result table
 kable_styling(kable(result, format = "html", digits = 7, format.args = list(big.mark = ",") ), full_width = FALSE)
 ```
-The best-performing support vector machine (polynomial) achieved an accuracy of 76.42%. This value is considerably lower than all other models which achieved accuracies above 80%. The best model, a gradient boosted machine, obtained an accuracy of 83.70% with the following parameters: Interaction Depth of 8, 1038 Trees, Shrinkage of 0.01, and 10 Minobsinnode. The confusion matrix for the GBM model can be seen below:
+The best-performing support vector machine (polynomial) achieved an accuracy of 73.58%. This value is considerably lower than all other models which achieved accuracies above 80%. The best model, a gradient boosted machine, obtained an accuracy of 87.40% with the following parameters: Interaction Depth of 8, 1038 Trees, Shrinkage of 0.01, and 10 Minobsinnode. The confusion matrix for the GBM model can be seen below:
 ```{r echo=FALSE}
 cm_gbm_tst$table
 ```
@@ -544,7 +544,7 @@ It should be noted that activity number 9 (XXXX) showed a very poor balanced cla
 
 Given the importance of activity recognition, increases in either classification performance or diversity of activity types could provide substantial benefits to the community. Potential applications of this model beyond simple activity recognition could include monitoring of different physical activity levels which are tied to general health and aging. Alternatively, activity recognition technology could be adapted to intelligent assistive devices for individuals with disabilities. Admittedly, the sample size of this study likely does not capture the natural variation of the population which could lead to poor performance on an unseen population. Additional work in this area is necessary before developing truly universal and generalizable activity recognition systems.
 
-# Appendix A
+# Appendix B
 | Activity Class (Number)        |Activity Type |
 |:------------------------------:|:------------:|
 |1                               | Brush teeth|
