@@ -38,7 +38,7 @@ load_data = function(data_path){
   data_matrix = list()
   index = 0
   
-  # each row is a file, the first element of a row is its class(1-16), the rest are flattened (through each time unit) 3 dimension data
+  # each row is a file, the first element of a row is its class(1-14), the rest are flattened (through each time unit) 3 dimension data
   
   for (action in list.files(path = data_path)){
     action_path = paste(data_path, action, sep = "/")
@@ -52,7 +52,6 @@ load_data = function(data_path){
       data_matrix[[index]] = c(num_action, as.list(t(data)))
     }
   }
-  
   return(data_matrix)
 }
 ```
@@ -151,7 +150,7 @@ Four types of statistical models were tuned in conjunction with preprocessing st
 
 Note that all the possible combinations of these four parameters were tested except for the case where overlap was greater than or equal to window length (i.e. $o \geq s$).
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 data_path = "HMP_Dataset"
 
 # Load raw data from the data file
@@ -167,7 +166,7 @@ data_trn = data[trainIndex,]
 data_tst = data[-trainIndex,]
 ```
 
-```{r echo=FLASE}
+```{r echo=FALSE}
 # Helper functions for parameter tuning to get the best result from the result data frame
 get_best_result = function(result_df) {
   best = which(lin_svm_cv['Accuracy'] == max(lin_svm_cv$'Accuracy', na.rm = T))
@@ -284,12 +283,6 @@ gbm_model_cv = train(class ~ .,
                      tuneGrid = gbm_grid,
                      verbose = FALSE)
 
-# Tuning Parameter
-gbm_model_cv$bestTune
-
-# Accuracy
-gbm_model_cv$results$Accuracy
-
 # Return train-test set accuracy
 gbm_trn_pred =predict(gbm_model_cv, data_trn)
 gbm_tst_pred = predict(gbm_model_cv, data_tst)
@@ -361,8 +354,6 @@ pred_knn = predict(knn_final, data_tst)
 
 # return test set accuracy
 cm_knn = confusionMatrix(pred_knn, data_tst$class)
-cm_knn$table
-cm_knn$overall['Accuracy']
 cval = as.integer(which.max(knn_final$results$Accuracy))
 ```
 
@@ -538,7 +529,7 @@ colnames(result) = col_names
 # render the result table
 kable_styling(kable(result, format = "html", digits = 7, format.args = list(big.mark = ",") ), full_width = FALSE)
 ```
-The best-performing support vector machine (polynomial) achieved an accuracy of 73.58%. This value is considerably lower than all other models which achieved accuracies above 80%. The best model, a gradient boosted machine, obtained an accuracy of 87.40% with the following parameters: Interaction Depth of 8, 1038 Trees, Shrinkage of 0.01, and 10 Minobsinnode. The confusion matrix for the GBM model can be seen below:
+The best-performing support vector machine (polynomial) achieved an accuracy of 76.42%. This value is considerably lower than all other models which achieved accuracies above 80%. The best model, a gradient boosted machine, obtained an accuracy of 83.70% with the following parameters: Interaction Depth of 8, 1038 Trees, Shrinkage of 0.01, and 10 Minobsinnode. The confusion matrix for the GBM model can be seen below:
 ```{r echo=FALSE}
 cm_gbm_tst$table
 ```
@@ -553,6 +544,20 @@ It should be noted that activity number 9 (XXXX) showed a very poor balanced cla
 
 Given the importance of activity recognition, increases in either classification performance or diversity of activity types could provide substantial benefits to the community. Potential applications of this model beyond simple activity recognition could include monitoring of different physical activity levels which are tied to general health and aging. Alternatively, activity recognition technology could be adapted to intelligent assistive devices for individuals with disabilities. Admittedly, the sample size of this study likely does not capture the natural variation of the population which could lead to poor performance on an unseen population. Additional work in this area is necessary before developing truly universal and generalizable activity recognition systems.
 
-
-
-
+# Appendix A
+| Activity Class (Number)        |Activity Type |
+|:------------------------------:|:------------:|
+|1                               | Brush teeth|
+|2                               | Climb stairs|
+|3                               | Comb hair|
+|4                               | Descend stairs|
+|5                               | Drink glass|
+|6                               | Eat meat|
+|7                               | Eat soup|
+|8                               | Getup bed|
+|9                               | Liedown bed|
+|10                              | Pour water|
+|11                              | Sitdown chair|
+|12                              | Standup chair|
+|13                              | Use telephon|
+|14                              | Walk|
