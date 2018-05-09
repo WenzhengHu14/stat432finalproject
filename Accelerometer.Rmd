@@ -2,7 +2,7 @@
 title: 'Activity Recognition from a Triaxial Wrist-mounted Accelerometer'
 author: "Nicholas Favale (favale2), Wenzheng Hu (whu14), Doyeon Kim (dkim172), Zachary Quicksall (zsq2)"
 date: "May 9, 2018"
-abstract: The following is an analysis of human movement based on UCI Machine Learning Repository data containing measurements of wrist movement from an accelerometer worn by human test subjects performing a variety of movements. After preprocessing the data for more thorough analysis, four different statistical tests (of several iterations each) were performed and the leading model from each test was identified. The most accurate test in terms of classifying the correct wrist movement given the accelerometer values was the gradient boosting machine with 87% accuracy. Discovering statistical tests with higher accuracy levels for human movement data like that of the data set in this study is imperative to improving tools that aid humans?? ability to move or understand their movement - from products like Fitbit to rehabilitation devices.
+abstract: The following is an analysis of human movement based on UCI Machine Learning Repository data containing measurements of wrist movement from an accelerometer worn by human test subjects performing a variety of movements. After preprocessing the data for more thorough analysis, four different statistical tests (of several iterations each) were performed and the leading model from each test was identified. The most accurate test in terms of classifying the correct wrist movement given the accelerometer values was the gradient boosting machine with 87% accuracy. Discovering statistical tests with higher accuracy levels for human movement data like that of the data set in this study is imperative to improving tools that aid humans' ability to move or understand their movement - from products like Fitbit to rehabilitation devices.
 output: 
   html_document: 
     theme: flatly
@@ -11,7 +11,7 @@ output:
 
 # Introduction
 
-The goal of this investigation is to construct classification models capable of accurately detecting Activities of Daily Living (ADL). The modern society strongly emphasizes the importance of valuing one??s well-being. For example, Misfit, Fitbit, and other wearable fitness trackers are widely used to examine people??s fitness and health conditions. Companies like Spotify use classification algorithms to queue up songs based on users?? activity detected by phone movement, which will be different for running than for lifting weights. Other applications even include assistive rehabilitation devices that can assist the physically impaired in completing basic tasks such as brushing their teeth or sipping from a glass of water. The development of accurate and generalizable ADL recognition will establish a strong basis for improving the quality of human lives.
+The goal of this investigation is to construct classification models capable of accurately detecting Activities of Daily Living (ADL). The modern society strongly emphasizes the importance of valuing one's well-being. For example, Misfit, Fitbit, and other wearable fitness trackers are widely used to examine people's fitness and health conditions. Companies like Spotify use classification algorithms to queue up songs based on users' activity detected by phone movement, which will be different for running than for lifting weights. Other applications even include assistive rehabilitation devices that can assist the physically impaired in completing basic tasks such as brushing their teeth or sipping from a glass of water. The development of accurate and generalizable ADL recognition will establish a strong basis for improving the quality of human lives.
 
 The data set, obtained from the UCI Machine Learning Repository, contains recordings of 14 ADL: `Brush Teeth`, `Climb Stairs`, `Comb Hair`, `Descend Stairs`, `Drink Glass`, `Eat Meat`, `Eat Soup`, `Get Up Bed`, `Lie down Bed`, `Pour Water`, `Sit Down Chair`, `Stand Up Chair`, `Use Telephone`, and `Walk`. Recordings of individuals performing each activity were gathered using wrist-worn triaxial accelerometers from 16 volunteers.
 
@@ -58,7 +58,7 @@ load_data = function(data_path){
 
 ### Preprocessing - Vector Quantization
 
-Raw data were collected at 50 hertz by a single triaxial accelerometer attached to each volunteer??s right wrist. The ith observation of the raw data contains acceleration measured in the x, y, and z axes which correspond to the following directions of motion:
+Raw data were collected at 50 hertz by a single triaxial accelerometer attached to each volunteer's right wrist. The ith observation of the raw data contains acceleration measured in the x, y, and z axes which correspond to the following directions of motion:
 
 - x axis: pointing toward the hand (Vertical)
 - y axis: pointing toward the left (Mediolateral)
@@ -270,7 +270,7 @@ acc_rf_tst = confusionMatrix(pred_rf_tst, data_tst$class)$overall['Accuracy']
 
 **Gradient Boosting Machine (GBM)**
 
-Initially, a coarse range of tuning parameters were selected and iteratively narrowed to create smaller tuning grids for the GBM model due to the linear and relatively slow rate of training compared to other tree-based models. The accuracy and ??Best Tune?? of each model iteration was recorded and used to update the grid. This process reduces training time.
+Initially, a coarse range of tuning parameters were selected and iteratively narrowed to create smaller tuning grids for the GBM model due to the linear and relatively slow rate of training compared to other tree-based models. The accuracy and 'Best Tune' of each model iteration was recorded and used to update the grid. This process reduces training time.
 
 ```{r echo=FALSE}
 # GBM Grid/Parameter
@@ -1072,21 +1072,21 @@ acc_rbf_trn = confusionMatrix(rbf_trn_pred, data_trn$class)$overall['Accuracy']
 acc_rbf_tst = confusionMatrix(rbf_tst_pred, data_tst$class)$overall['Accuracy']
 ```
 
-# Appendix B (Activity dictionary)
+# Appendix B (Activity Dictionary)
 
-| Activity Class (Number)        |Activity Type |
-|:------------------------------:|:------------:|
-|1                               | Brush teeth|
-|2                               | Climb stairs|
-|3                               | Comb hair|
-|4                               | Descend stairs|
-|5                               | Drink glass|
-|6                               | Eat meat|
-|7                               | Eat soup|
-|8                               | Getup bed|
-|9                               | Liedown bed|
-|10                              | Pour water|
-|11                              | Sitdown chair|
-|12                              | Standup chair|
-|13                              | Use telephone|
-|14                              | Walk|
+| Activity Class (Number)        | Activity Type  |
+|:------------------------------:|:--------------:|
+|1                               | Brush teeth    |
+|2                               | Climb stairs   |
+|3                               | Comb hair      |
+|4                               | Descend stairs |
+|5                               | Drink glass    |
+|6                               | Eat meat       |
+|7                               | Eat soup       |
+|8                               | Getup bed      |
+|9                               | Liedown bed    |
+|10                              | Pour water     |
+|11                              | Sitdown chair  |
+|12                              | Standup chair  |
+|13                              | Use telephone  |
+|14                              | Walk           |
