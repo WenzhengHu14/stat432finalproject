@@ -256,7 +256,7 @@ rf_cv = tune_rf(data_matrix_raw, cut_sizes=cut_sizes, overlaps=overlaps, nums_cl
 best_result = get_best_result(rf_cv)
 ```
 
-The best model with parameters tunned from the above search space is constructed and presented below. We calculate its training and testing accuracy
+The best model with parameters tunned from the above search space is constructed and presented below. We calculate its training and testing accuracy.
 
 ```{r echo=FALSE}
 cv_5 = trainControl(method = "cv", number = 5)
