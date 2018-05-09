@@ -1,5 +1,5 @@
 ---
-title: 'Classification of Human Wrist Movement'
+title: 'Activity Recognition from a Triaxial Wrist-mounted Accelerometer'
 author: "Nicholas Favale (favale2), Wenzheng Hu (whu14), Doyeon Kim (dkim172), Zachary Quicksall (zsq2)"
 date: "May 9, 2018"
 abstract: The following is an analysis of human movement based on UCI Machine Learning Repository data containing measurements of wrist movement from an accelerometer worn by human test subjects performing a variety of movements. After preprocessing the data for more thorough analysis, four different statistical tests (of several iterations each) were performed and the leading model from each test was identified. The most accurate test in terms of classifying the correct wrist movement given the accelerometer values was the gradient boosting machine with 87% accuracy. Discovering statistical tests with higher accuracy levels for human movement data like that of the data set in this study is imperative to improving tools that aid humans?? ability to move or understand their movement - from products like Fitbit to rehabilitation devices.
@@ -539,7 +539,7 @@ kable_styling(kable(result, format = "html", digits = 7, format.args = list(big.
 
 The worst-performing model using k-nearest neighbors achieved an accuracy of 76.83%. This value is considerably lower than all other models which achieved accuracies near or above 80%. The best model, a gradient boosted machine, obtained an accuracy of 83.33% with the following parameters: Interaction Depth of 8, 1038 Trees, Shrinkage of 0.01, and 10 Minobsinnode. The confusion matrix for the GBM model can be seen below:
 
-**GBM Test Confusion Matrix**
+**GBM Confusion Matrix**
 ```{r echo=FALSE}
 cm_gbm_tst$table
 ```
