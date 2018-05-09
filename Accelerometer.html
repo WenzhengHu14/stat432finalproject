@@ -147,8 +147,7 @@ The following is an analysis of human movement based on UCI Machine Learning Rep
 </ul></li>
 <li><a href="#results">Results</a></li>
 <li><a href="#discussion">Discussion</a></li>
-<li><a href="#discussion-1">Discussion</a></li>
-<li><a href="#appendix-a">Appendix A</a></li>
+<li><a href="#appendix-b">Appendix B</a></li>
 </ul>
 </div>
 
@@ -206,37 +205,10 @@ The following is an analysis of human movement based on UCI Machine Learning Rep
 </tbody>
 </table>
 <p>Note that all the possible combinations of these four parameters were tested except for the case where overlap was greater than or equal to window length (i.e. <span class="math inline">\(o \geq s\)</span>).</p>
-<pre><code>## Found more than one class &quot;kcca&quot; in cache; using the first, from namespace 'flexclust'</code></pre>
-<pre><code>## Also defined by 'kernlab'</code></pre>
-<pre><code>## Found more than one class &quot;kcca&quot; in cache; using the first, from namespace 'flexclust'</code></pre>
-<pre><code>## Also defined by 'kernlab'</code></pre>
-<pre><code>## Found more than one class &quot;kcca&quot; in cache; using the first, from namespace 'flexclust'</code></pre>
-<pre><code>## Also defined by 'kernlab'</code></pre>
 <p><strong>Random Forest</strong> Random forests were tuned across all possible values of mtry (mtry = 1..n, where n is the total number of features).</p>
 <p>The best model with parameters tunned from the above search space is constructed and presented below. We calculate its training and testing accuracy</p>
 <p><strong>Gradient Boosting Machine (GBM)</strong> Initially, a coarse range of tuning parameters were selected and iteratively narrowed to create smaller tuning grids for the GBM model due to the linear and relatively slow rate of training compared to other tree-based models. The accuracy and ??Best Tune?? of each model iteration was recorded and used to update the grid. This process reduces training time.</p>
-<pre><code>##   n.trees interaction.depth shrinkage n.minobsinnode
-## 1    1038                 8      0.01             10</code></pre>
-<pre><code>## [1] 0.7980396</code></pre>
 <p><strong>K-Nearest Neighbors (KNN)</strong> Because KNN is a relatively simple and quick model compared to others used in this analysis, it was possible to test a wide range of parameters, or k-values, before testing. Specifically, parameters k between 3 and 100 (inclusive) were examined.</p>
-<pre><code>##           Reference
-## Prediction  1  2  3  4  5  6  7  8  9 10 11 12 13 14
-##         1   2  0  0  0  0  0  0  0  0  0  0  0  0  0
-##         2   0 24  0  3  0  0  0  0  0  0  0  0  0  6
-##         3   0  0  8  0  0  0  0  0  1  0  0  0  0  0
-##         4   0  3  0  9  0  0  0  0  0  0  0  0  0  0
-##         5   0  1  0  0 30  0  0  0  1  0  1  0  0  1
-##         6   0  0  0  0  0  1  0  0  0  0  0  0  0  0
-##         7   0  0  0  0  0  0  0  0  0  0  0  0  0  0
-##         8   0  0  0  0  0  0  0 22  2  0  0  3  0  0
-##         9   1  0  1  0  0  0  0  1  0  0  2  0  0  0
-##         10  0  0  0  0  0  0  0  1  1 27  0  0  0  0
-##         11  0  0  0  0  0  0  0  2  1  3 21  7  0  1
-##         12  0  1  0  0  0  0  0  4  2  0  6 20  0  0
-##         13  0  0  0  0  0  0  0  0  0  0  0  0  3  0
-##         14  0  1  0  0  0  0  0  0  0  0  0  0  0 22</code></pre>
-<pre><code>##  Accuracy 
-## 0.7682927</code></pre>
 <p><strong>Support Vector Machine (SVM)</strong> Support vector machines using linear, polynomial, and gaussian kernels were trained across appropriate parameter search spaces using 5-fold cross validation. Optimal tuning parameters were selected on the basis of highest accuracy.</p>
 </div>
 </div>
@@ -265,7 +237,7 @@ Random Forest
 1.0000000
 </td>
 <td style="text-align:right;">
-0.8414634
+0.8455285
 </td>
 </tr>
 <tr>
@@ -273,10 +245,10 @@ Random Forest
 Linear SVM
 </td>
 <td style="text-align:right;">
-0.9426644
+0.9241147
 </td>
 <td style="text-align:right;">
-0.8455285
+0.8414634
 </td>
 </tr>
 <tr>
@@ -284,10 +256,10 @@ Linear SVM
 Polynomial SVM
 </td>
 <td style="text-align:right;">
-0.9966273
+0.9898820
 </td>
 <td style="text-align:right;">
-0.8170732
+0.8048780
 </td>
 </tr>
 <tr>
@@ -298,7 +270,7 @@ Gaussian SVM
 1.0000000
 </td>
 <td style="text-align:right;">
-0.7967480
+0.7886179
 </td>
 </tr>
 <tr>
@@ -306,10 +278,10 @@ Gaussian SVM
 KNN
 </td>
 <td style="text-align:right;">
-0.8903879
+0.8819562
 </td>
 <td style="text-align:right;">
-0.7642276
+0.7723577
 </td>
 </tr>
 <tr>
@@ -320,7 +292,7 @@ Gbm
 1.0000000
 </td>
 <td style="text-align:right;">
-0.8373984
+0.8292683
 </td>
 </tr>
 </tbody>
@@ -329,19 +301,19 @@ Gbm
 <pre><code>##           Reference
 ## Prediction  1  2  3  4  5  6  7  8  9 10 11 12 13 14
 ##         1   3  0  0  0  0  0  0  0  0  0  0  0  0  0
-##         2   0 25  0  2  0  0  0  0  0  0  0  0  0  5
-##         3   0  0  9  0  0  0  0  0  0  0  0  0  0  0
+##         2   0 25  0  2  0  0  0  0  0  0  0  0  0  0
+##         3   0  0  9  0  0  0  0  0  1  0  0  0  0  0
 ##         4   0  2  0 10  0  0  0  0  0  0  0  0  0  0
-##         5   0  1  0  0 29  0  0  0  0  0  0  1  0  0
+##         5   0  1  0  0 28  0  0  0  0  0  0  0  0  0
 ##         6   0  0  0  0  0  1  0  0  0  0  0  0  0  0
 ##         7   0  0  0  0  0  0  0  0  0  0  0  0  0  0
-##         8   0  0  0  0  0  0  0 26  3  0  1  0  0  1
-##         9   0  0  0  0  0  0  0  1  1  0  0  0  0  0
-##         10  0  0  0  0  0  0  0  1  0 30  0  1  0  0
-##         11  0  0  0  0  0  0  0  1  2  0 26  7  0  1
-##         12  0  1  0  0  0  0  0  1  2  0  3 21  0  1
-##         13  0  0  0  0  1  0  0  0  0  0  0  0  3  0
-##         14  0  1  0  0  0  0  0  0  0  0  0  0  0 22</code></pre>
+##         8   0  0  0  0  0  0  0 25  3  0  2  1  0  0
+##         9   0  1  0  0  0  0  0  1  1  0  0  1  0  0
+##         10  0  0  0  0  2  0  0  1  0 28  0  0  0  0
+##         11  0  0  0  0  0  0  0  1  2  1 21  7  0  0
+##         12  0  1  0  0  0  0  0  2  1  1  7 21  0  1
+##         13  0  0  0  0  0  0  0  0  0  0  0  0  3  0
+##         14  0  0  0  0  0  0  0  0  0  0  0  0  0 29</code></pre>
 </div>
 <div id="discussion" class="section level1">
 <h1>Discussion</h1>
@@ -350,11 +322,8 @@ Gbm
 <p>It should be noted that activity number 9 (XXXX) showed a very poor balanced classification accuracy of 49%. This is quite misleading given that the positive predictive value for that class is in fact 0%. It is interesting that the model failed completely to predict this particular class given that a total of 20 examples were available in the training set. While this is not the largest representative sample, it is on par with some of the other classes which achieved fairly good positive prediction (e.g. class 3 “XXXX” achieved a PPV of 83% with only 22 training instances). It is possible that this poor accuracy is simply a result of the minimal number of examples in the testing set (only 8 instances), which allows for easy skewing of performance metrics. Alternatively, it may be that the features provided to the model are insufficient for discriminating this activity type. It would be ideal to obtain additional examples across all activity types to produce a data set which has a fairly balanced class distribution. Upsampling of minority class examples may improve performance, but this approach is not ideal–especially compared to undersampling methods–since upsampling the minority class would require duplication of the current instances which may add unwanted bias to the model.</p>
 <p>Given the importance of activity recognition, increases in either classification performance or diversity of activity types could provide substantial benefits to the community. Potential applications of this model beyond simple activity recognition could include monitoring of different physical activity levels which are tied to general health and aging. Alternatively, activity recognition technology could be adapted to intelligent assistive devices for individuals with disabilities. Admittedly, the sample size of this study likely does not capture the natural variation of the population which could lead to poor performance on an unseen population. Additional work in this area is necessary before developing truly universal and generalizable activity recognition systems.</p>
 </div>
-<div id="discussion-1" class="section level1">
-<h1>Discussion</h1>
-</div>
-<div id="appendix-a" class="section level1">
-<h1>Appendix A</h1>
+<div id="appendix-b" class="section level1">
+<h1>Appendix B</h1>
 <table>
 <thead>
 <tr class="header">
